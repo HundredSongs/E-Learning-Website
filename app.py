@@ -44,34 +44,21 @@ def index():
 def admin():
 
     if request.method == "POST":
-        
+
         id = request.form.get("id")
         ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        if id == "new":
-
-            text = request.form.get("text")
-
-            db.execute("INSERT INTO courses (text, price) VALUES ('Description', 'Free')")
-            return redirect("/admin")
-
-        elif request.form.get("text"):
-
-            text = request.form.get("text")
-
-            print(courses[0]["id"])
-
-            db.execute("UPDATE courses SET text = ? WHERE id = ?", text, courses[0]["id"])
-            return redirect("/admin")
-
-        else:
-            return render_template("admin.html", courses = courses, ids = ids)
+        flash(id)
+        return render_template("admin.html", courses = courses, ids = ids)
 
     else:
-
+        id = request.form.get("id")
         ids = db.execute("SELECT * FROM courses")
-        return render_template("admin.html", ids = ids)
+        courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
+
+        flash("Render_Template")
+        return render_template("admin.html", courses = courses, ids = ids)
 
 
 @app.route("/account")

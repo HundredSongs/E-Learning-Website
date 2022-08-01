@@ -6,43 +6,44 @@ Home
 
 {% block main %}
 <p></p>
-{% if not courses %}
-    <form action="/admin" method="post">
-        <div class="mb-3">
-            <select class="form-select mx-auto w-auto" name="id">
-                <option selected="" value="new">New Course</option>
-                {% for id in ids %}
-                    <option value="{{ id.id }}">{{ id.id }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button class="btn btn-primary" type="submit">Change</button>
-    </form>
-
-{% else %}
-{% for course in courses %}
 
 <form action="/admin" method="post">
 
-    <div class="mb-3">
-        <select class="form-select mx-auto w-auto" name="id">
-            <option  value="new">New Course</option>
-                <option selected="" value="{{ course.id }}">{{ course.id }}</option>
-        </select>
+{% for course in courses %}
+    
+Course ID : {{ course.id }} - {{ course.name }}
+
+    
+<div class="input-group mb-3" name="name" id="name">
+    <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
+    <input name="name" id="name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="{{ course.name }}" value="{{ course.name }}">
     </div>
 
 
-    <div class="input-group" name="text" id="text" >
-        <span class="input-group-text">With textarea</span>
-        <textarea class="form-control" aria-label="With textarea" name="text" id="text" type="text" value="{{ course.text }}">{{ course.text }}</textarea>
-      </div>
-      <p></p>
-    <button class="btn btn-primary" type="submit">Submit</button>
-
-
-</form>
+<div class="input-group" name="text" id="text" >
+    <span class="input-group-text">Description</span>
+    <textarea name="text" id="text" class="form-control" aria-label="With textarea" type="text" value="{{ course.text }}">{{ course.text }}</textarea>
+    </div>
 
 {% endfor %}
-{% endif %}
+    
+<p></p>
+<p>Chose the course to change! Be carefull.</p>
+<div class="mb-3">
+    <select class="form-select mx-auto w-auto" name="id" id="id">
+        <option selected="" disabled="" value="Chose a Course">Chose a Course</option>
+        <option value="new"> New Course</option>
+        {% for id in ids %}
+            <option  value="{{ id.id }}">{{ id.id }} - {{ id.name }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+
+
+<p></p>
+<button class="btn btn-primary" type="submit">Submit</button>
+    
+    </form>
 
 {% endblock %}
