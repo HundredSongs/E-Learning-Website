@@ -46,13 +46,24 @@ def admin():
     if request.method == "POST":
         
         id = request.form.get("id")
+        ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        return render_template("admin.html", courses = courses)
+        if request.form.get("text"):
+
+            text = request.form.get("text")
+
+            print(id)
+
+            db.execute("UPDATE courses SET text = ? WHERE id = ?", text, id)
+            return redirect("/admin")
+
+        else:
+            return render_template("admin.html", courses = courses, ids = ids)
 
     else:
-        ids = db.execute("SELECT * FROM courses")
 
+        ids = db.execute("SELECT * FROM courses")
         return render_template("admin.html", ids = ids)
 
 
