@@ -49,15 +49,34 @@ def admin():
         ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        flash(id)
-        return render_template("admin.html", courses = courses, ids = ids)
+        # Create a new course
+        if id == "new":
+            db.execute("INSERT INTO courses (text, price, name) VALUES ('Description', 'Free', 'Name')")
 
+            flash("New Course Created")
+            return redirect("/admin")
+
+        # Delete Course
+        
+
+        # Change course info
+        elif request.form.get("name") and request.form.get("text") and request.form.get("id"):
+
+            db.execute("UPDATE courses SET text = ?, name = ? WHERE id = ?",
+                request.form.get("text"), request.form.get("name"), request.form.get("id"))
+
+            flash("Course Updated")
+            return redirect("/admin")
+
+        else:
+            return render_template("admin.html", courses = courses, ids = ids)
+
+    # Render Template
     else:
         id = request.form.get("id")
         ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        flash("Render_Template")
         return render_template("admin.html", courses = courses, ids = ids)
 
 

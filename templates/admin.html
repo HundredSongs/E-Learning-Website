@@ -19,6 +19,11 @@ Course ID : {{ course.id }} - {{ course.name }}
     <input name="name" id="name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="{{ course.name }}" value="{{ course.name }}">
     </div>
 
+<div class="input-group mb-3" name="price" id="price">
+    <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
+    <input name="price" id="price" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" placeholder="{{ course.price }}" value="{{ course.price }}">
+    </div>
+
 
 <div class="input-group" name="text" id="text" >
     <span class="input-group-text">Description</span>
@@ -42,7 +47,9 @@ Course ID : {{ course.id }} - {{ course.name }}
 
 
 <p></p>
-<button class="btn btn-primary" type="submit">Submit</button>
+<button class="btn btn-danger" type="submit">Submit</button>
+<button id="delete" name="delete" class="btn btn-warning" type="submit">Delete</button>
+
     
     </form>
 
