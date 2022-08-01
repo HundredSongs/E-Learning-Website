@@ -10,7 +10,7 @@ Home
     <form action="/admin" method="post">
         <div class="mb-3">
             <select class="form-select mx-auto w-auto" name="id">
-                <option disabled="" selected="" value="Symbol">None</option>
+                <option selected="" value="new">New Course</option>
                 {% for id in ids %}
                     <option value="{{ id.id }}">{{ id.id }}</option>
                 {% endfor %}
@@ -25,7 +25,10 @@ Home
 <form action="/admin" method="post">
 
     <div class="mb-3">
-        <a name="id"><large>Course : {{ course.id }}</large></a>
+        <select class="form-select mx-auto w-auto" name="id">
+            <option  value="new">New Course</option>
+                <option selected="" value="{{ course.id }}">{{ course.id }}</option>
+        </select>
     </div>
 
 

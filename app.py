@@ -49,13 +49,20 @@ def admin():
         ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        if request.form.get("text"):
+        if id == "new":
 
             text = request.form.get("text")
 
-            print(id)
+            db.execute("INSERT INTO courses (text, price) VALUES ('Description', 'Free')")
+            return redirect("/admin")
 
-            db.execute("UPDATE courses SET text = ? WHERE id = ?", text, id)
+        elif request.form.get("text"):
+
+            text = request.form.get("text")
+
+            print(courses[0]["id"])
+
+            db.execute("UPDATE courses SET text = ? WHERE id = ?", text, courses[0]["id"])
             return redirect("/admin")
 
         else:
