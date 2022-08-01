@@ -50,8 +50,7 @@ def admin():
 @login_required
 def account():
 
-    users_courses = db.execute(
-        "SELECT * FROM users_courses, courses WHERE courses.id = users_couses.course_id AND user_id = ?",
+    users_courses = db.execute("SELECT * FROM users_courses, courses WHERE courses.id = users_courses.course_id AND user_id = ?",
          session["user_id"])
 
     return render_template("account.html", ids = users_courses)

@@ -12,6 +12,8 @@ Account
       <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
 
         {% for id in ids %}
+        {% if ids >= 1 %}
+
         <div class="col">
           <div class="card shadow-sm">
             <img src="../static/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
@@ -26,6 +28,12 @@ Account
             </div>
           </div>
         </div>
+
+        {% else %}
+
+        <p> BUY </p>
+
+        {% endif %}
         {% endfor %}
 
 
