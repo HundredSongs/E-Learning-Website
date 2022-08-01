@@ -43,27 +43,31 @@ def index():
 @login_required
 def admin():
 
-    return render_template("")
+    return render_template("admin.html")
 
 
 @app.route("/account")
 @login_required
 def account():
 
-    courses = db.execute("SELECT course_id FROM courses WHERE user = ?", session["user_id"])
+    users_courses = db.execute(
+        "SELECT * FROM users_courses, courses WHERE courses.id = users_couses.course_id AND user_id = ?",
+         session["user_id"])
 
-    return render_template("account.html", ids = courses)
+    return render_template("account.html", ids = users_courses)
 
 
 @app.route("/courses")
 def courses():
 
-    return render_template("courses.html")
+    courses = db.execute("SELECT * FROM courses")
+    
+    return render_template("courses.html", ids = courses)
+
 
 @app.route("/course1")
 def course1():
 
-    
     return render_template("./courses/1.html")
 
 
