@@ -1,0 +1,58 @@
+{% extends "layout-users.html" %}
+
+{% block title %}
+Sign-up
+{% endblock %}
+
+{% block main %}  
+<form action="/signup" method="post">
+
+    <img class="mb-4" src="../static/logo2.png" alt="" width="72" height="57">
+    <h1 class="h3 mb-3 fw-normal">Sign In</h1>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="alert alert-danger mb-0 text-center" role="alert">
+      {% for message in messages %}
+      {{ message }}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-floating">
+      <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+      <label for="username">Username</label>
+    </div>
+
+    <div class="form-floating">
+      <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+      <label for="password">Password</label>
+    </div>
+
+    <div class="form-floating">
+        <input type="password" class="form-control" id="confirmation" name="confirmation" placeholder="Password">
+        <label for="confirmation">Confirm Password</label>
+    </div>
+    
+    <div class="checkbox mb-3">
+      <label>
+        <input type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div>
+
+    <button class="w-100 btn btn-lg btn-danger" type="submit">Create Account</button>
+
+    <p></p>
+    <a href="/login"><strong>Allready registered? Click here!</strong></a>
+  
+    <p></p>
+    <ul class="nav justify-content-center">
+      <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">FAQs</a></li>
+      <li class="nav-item"><a href="#" class="nav-link px-2 text-muted">About</a></li>
+    </ul>
+    <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
+  
+  </form>
+{% endblock %}
