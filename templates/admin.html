@@ -5,8 +5,30 @@ Home
 {% endblock %}
 
 {% block main %}
+<p></p>
 
-    <div class="col-lg-10">
-      <input type="email" class="form-control form-control-lg" id="colFormLabelLg" placeholder="col-form-label-lg">
-    </div>
+    <form action="/admin" method="post">
+        <div class="mb-3">
+            <select class="form-select mx-auto w-auto" name="symbol">
+                <option disabled="" selected="" value="Symbol">None</option>
+                {% for id in ids %}
+                    <option id="id" value="{{ id.id }}">{{ id.id }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="btn btn-primary" type="submit">Change</button>
+    </form>
+
+{% for course in courses %}
+
+<form action="/admin" method="post">
+    <div class="input-group">
+        <span class="input-group-text">With textarea</span>
+        <textarea class="form-control" aria-label="With textarea" value="{{ course.text }}"></textarea>
+      </div>
+    <button class="btn btn-primary" type="submit">Submit</button>
+</form>
+
+{% endfor %}
+
 {% endblock %}

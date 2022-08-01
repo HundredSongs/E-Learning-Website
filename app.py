@@ -39,11 +39,21 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
 @login_required
 def admin():
 
-    return render_template("admin.html")
+    if request.method == "POST":
+        
+        id = request.form.get("id")
+        courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
+
+        return render_template("admin.html", courses = courses)
+
+    else:
+        ids = db.execute("SELECT * FROM courses")
+
+        return render_template("admin.html", ids = ids)
 
 
 @app.route("/account")
