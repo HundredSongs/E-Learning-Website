@@ -22,7 +22,7 @@
 
 
         <!-- Navbar -->
-        <header class="p-3 text-bg-dark sticky-top">
+        <header class="p-3 text-bg-light sticky-sm-top">
             <div class="container">
               <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
@@ -33,39 +33,39 @@
                 {% if session["user_id"] %}
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="/" class="nav-link px-2 text-white">Home</a></li>
-                    <li><a href="/courses" class="nav-link px-2 text-white">Courses</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+                    <li><a href="/" class="nav-link px-2 text-dark">Home</a></li>
+                    <li><a href="/courses" class="nav-link px-2 text-dark">Courses</a></li>
+                    <li><a href="#" class="nav-link px-2 text-dark">FAQs</a></li>
+                    <li><a href="#" class="nav-link px-2 text-dark">About</a></li>
                   </ul>
           
                   <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-                    <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+                    <input type="search" class="form-control form-control-light text-bg-light" placeholder="Search..." aria-label="Search">
                   </form>
 
 
                   <div class="text-end">
-                    <a class="btn btn-outline-light me-2" href="/admin" role="button">Admin</a>
-                    <a class="btn btn-outline-light me-2" href="/account" role="button">Account</a>
-                    <a class="btn btn-warning" href="/logout" role="button">Logout</a>
+                    <a class="btn btn-outline-dark me-2" href="/admin" role="button">Admin</a>
+                    <a class="btn btn-outline-dark me-2" href="/account" role="button">Account</a>
+                    <a class="btn btn-danger" href="/logout" role="button">Logout</a>
                   </div>              
 
                 {% else %}
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                  <li><a href="/" class="nav-link px-2 text-white">Home</a></li>
-                  <li><a href="/courses" class="nav-link px-2 text-white">Courses</a></li>
-                  <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-                  <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+                  <li><a href="/" class="nav-link px-2 text-dark">Home</a></li>
+                  <li><a href="/courses" class="nav-link px-2 text-dark">Courses</a></li>
+                  <li><a href="#" class="nav-link px-2 text-dark">FAQs</a></li>
+                  <li><a href="#" class="nav-link px-2 text-dark">About</a></li>
                 </ul>
         
                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-                  <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+                  <input type="search" class="form-control form-control-light text-bg-light" placeholder="Search..." aria-label="Search">
                 </form>
         
                 <div class="text-end">
-                  <a class="btn btn-outline-light me-2" href="/login" role="button">Login</a>
-                  <a class="btn btn-warning" href="/signup" role="button">Sign-up</a>
+                  <a class="btn btn-outline-dark me-2" href="/login" role="button">Login</a>
+                  <a class="btn btn-danger" href="/signup" role="button">Sign-up</a>
                 </div>
 
                 {% endif %}
