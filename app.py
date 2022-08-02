@@ -109,14 +109,22 @@ def buy():
 
     id = request.form.get("id")
     course = db.execute("SELECT * FROM courses WHERE id = ?", id)
+    users_courses = db.execute("SELECT * FROM users_courses WHERE course_id = ? AND user_id = ?", id, session["user_id"])
     price = course[0]["price"]
 
+
+    # Enroll if it's a free course
     if price.casefold() == "free":
 
         db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
                     session["user_id"], course[0]["id"])
         
         return redirect("/account")
+
+    # Go to an alreaady owned course
+    elif len(users_courses[0]) == 1:
+
+        return render_template("course.html", id = users_courses)
 
     return render_template("buy.html")
 
@@ -128,18 +136,18 @@ def courses():
     return render_template("courses.html", ids = courses)
 
 
-@app.route("/course", methods=["GET", "POST"])
-def course():
+@app.route("/info", methods=["GET", "POST"])
+def info():
 
     if request.method == "POST":
 
         id = request.form.get("id")
         course = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        return render_template("course.html", ids = course)
+        return render_template("info.html", ids = course)
     
     else:
-        return redirect("/courses")
+        return redirect("/info")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -173,8 +181,7 @@ def login():
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
 
-        flash("You are logged in")
-        return redirect("/")
+        return redirect("/account")
 
     return render_template("login.html")
 
@@ -182,11 +189,11 @@ def login():
 @app.route("/logout")
 def logout():
 
+    """Logout user"""
+
     # Forget any user_id
     session.clear()
 
-    """Logout user"""
-    flash("Logged out")
     return redirect("/")
 
 
@@ -241,9 +248,8 @@ def signup():
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
         
-        flash("You are logged in")
         # Redirect user to home page
-        return redirect("/")
+        return redirect("/courses")
 
     else:
         return render_template("signup.html")

@@ -6,7 +6,7 @@ Home
 
 {% block main %}
 
-
+{% if not session["user_id"] %}
 
 <section class="py-5 text-center container">
     <div class="row py-lg-5">
@@ -23,7 +23,7 @@ Home
 
 
 
-
+{% endif %}
 
   
   <div class="album py-5 bg-light">
@@ -33,7 +33,7 @@ Home
 
         {% for id in ids %}
 
-        <form action="/course" method="post">
+        <form action="/info" method="post">
 
         <div class="col">
           <div class="card shadow-sm">
