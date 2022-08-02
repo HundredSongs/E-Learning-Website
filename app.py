@@ -39,7 +39,7 @@ def index():
 
     courses = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
     return render_template("index.html", ids = courses)
-
+    
 
 @app.route("/admin", methods=["GET", "POST"])
 @login_required
@@ -89,7 +89,32 @@ def account():
     users_courses = db.execute("SELECT * FROM users_courses, courses WHERE courses.id = users_courses.course_id AND user_id = ?",
          session["user_id"])
 
+    if len(users_courses) == 0:
+
+        free = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
+
+        flash("Look for a course that you may like!")
+        return render_template("account.html", frees = free)
+
     return render_template("account.html", ids = users_courses)
+
+
+@app.route("/buy", methods=["GET", "POST"])
+@login_required
+def buy():
+
+    id = request.form.get("id")
+    course = db.execute("SELECT * FROM courses WHERE id = ?", id)
+    price = course[0]["price"]
+
+    if price.casefold() == "free":
+
+        db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
+                    session["user_id"], course[0]["id"])
+        
+        return redirect("/account")
+
+    return render_template("buy.html")
 
 
 @app.route("/courses")

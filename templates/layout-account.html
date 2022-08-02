@@ -74,6 +74,20 @@
             </div>
           </header>
         <!-- End Navbar -->
+
+
+        
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="alert alert-danger mb-0 text-center" role="alert">
+          {% for message in messages %}
+          {{ message }}
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+
     
         <main class="container-fluid text-center">
             {% block main %}{% endblock %}
