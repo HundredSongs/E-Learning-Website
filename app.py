@@ -5,6 +5,7 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
+from requests import post
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import login_required
@@ -94,14 +95,21 @@ def account():
 def courses():
 
     courses = db.execute("SELECT * FROM courses")
-    
     return render_template("courses.html", ids = courses)
 
 
-@app.route("/course1")
-def course1():
+@app.route("/course", methods=["GET", "POST"])
+def course():
 
-    return render_template("./courses/1.html")
+    if request.method == "POST":
+
+        id = request.form.get("id")
+        course = db.execute("SELECT * FROM courses WHERE id = ?", id)
+        
+        return render_template("course.html", ids = course)
+    
+    else:
+        return redirect("/courses")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -117,11 +125,12 @@ def login():
         # Ensure username was submitted
         if not request.form.get("username"):
             flash('must provide username')
-            return redirect("/login")
+            return render_template("login.html")
+
         # Ensure password was submitted
         elif not request.form.get("password"):
             flash("Must provide password")
-            return redirect("/login")
+            return render_template("login.html")
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
@@ -129,7 +138,7 @@ def login():
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
             flash("Wrong username/password")
-            return redirect("/login")
+            return render_template("login.html")
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -168,19 +177,22 @@ def signup():
         # Ensure username was submitted
         if not request.form.get("username"):
             flash("Must provide username")
-            return redirect("/signup")
+            return render_template("signup.html")
+
         # Ensure password was submitted
         elif not request.form.get("password"):
             flash("Must provide password")
-            return redirect("/signup")
+            return render_template("signup.html")
+            
         # Ensure password confirmation was submitted
         elif not request.form.get("confirmation"):
             flash("Must provide password")
-            return redirect("/signup")
+            return render_template("signup.html")
+
         # # Ensure the passwords are the same
         elif password != confirmation:
             flash("Passwords dont match")
-            return redirect("/signup")
+            return render_template("signup.html")
             
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
@@ -188,7 +200,7 @@ def signup():
         # Check if user is allready taken
         if len(rows) == 1:
             flash("Username allready exists!")
-            return redirect("/signup")
+            return render_template("signup.html")
 
         # Create new row in people table
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, generate_password_hash(password))
