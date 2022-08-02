@@ -37,7 +37,8 @@ def after_request(response):
 @app.route("/")
 def index():
 
-    return render_template("index.html")
+    courses = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
+    return render_template("index.html", ids = courses)
 
 
 @app.route("/admin", methods=["GET", "POST"])
@@ -61,10 +62,10 @@ def admin():
         
 
         # Change course info
-        elif request.form.get("name") and request.form.get("text") and request.form.get("id"):
+        elif request.form.get("name") and request.form.get("text") and request.form.get("id") and request.form.get("price"):
 
-            db.execute("UPDATE courses SET text = ?, name = ? WHERE id = ?",
-                request.form.get("text"), request.form.get("name"), request.form.get("id"))
+            db.execute("UPDATE courses SET text = ?, price = ?, name = ? WHERE id = ?",
+                request.form.get("text"),request.form.get("price"), request.form.get("name"), request.form.get("id"))
 
             flash("Course Updated")
             return redirect("/admin")
@@ -105,7 +106,7 @@ def course():
 
         id = request.form.get("id")
         course = db.execute("SELECT * FROM courses WHERE id = ?", id)
-        
+
         return render_template("course.html", ids = course)
     
     else:

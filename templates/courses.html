@@ -22,6 +22,10 @@ Home
   </section>
 
 
+
+
+
+  
   <div class="album py-5 bg-light">
     <div class="container">
 
@@ -33,7 +37,7 @@ Home
 
         <div class="col">
           <div class="card shadow-sm">
-            <img src="../static/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
+            <img src="../static/courses/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
 
             <div class="card-body">
               <p class="card-text">{{ id.text }}</p>
@@ -41,7 +45,7 @@ Home
                 <div class="btn-group">
                   <button class="btn btn-sm btn-outline-secondary" id="id" name="id" value="{{ id.id }}">Enroll</a>
                 </div>
-                <small class="text-muted">${{ id.price }}</small>
+                <small class="fs-6 fw-semibold">{{ id.price }}</small>
               </div>
             </div>
           </div>
