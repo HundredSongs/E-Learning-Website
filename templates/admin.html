@@ -6,6 +6,8 @@ Home
 
 {% block main %}
 
+
+{% if courses %}
 <div class="container-fluid text-center">
 <p></p>
 
@@ -13,7 +15,8 @@ Home
 
 {% for course in courses %}
     
-<p class="alert alert-danger fs-6 fw-bold" role="alert">{{ course.name }} -> ID : {{ course.id }}</p> 
+<p class="alert alert-danger fs-6 fw-bold" role="alert">{{ course.name }} -> ID : {{ course.id }}</p>
+<input hidden="" id="id" name="id" value="{{ course.id }}">
     
 <div class="input-group mb-3" name="name" id="name">
     <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
@@ -31,8 +34,23 @@ Home
     <textarea name="text" id="text" class="form-control" aria-label="With textarea" type="text" value="{{ course.text }}" style="height: 150px" >{{ course.text }}</textarea>
     </div>
 
-{% endfor %}
+    <p></p>
+    <button class="btn btn-danger" type="submit">Submit Changes</button>
     
+</form>
+</div>
+
+
+{% endfor %}
+
+{% else %}
+
+
+<div class="container-fluid text-center">
+<p></p>
+
+<form action="/admin" method="post">
+
 <p></p>
 <p>Chose the course to change! Be carefull.</p>
 <div class="mb-3">
@@ -40,7 +58,7 @@ Home
         <option selected="" disabled="" value="Chose a Course">Chose a Course</option>
         <option value="new"> New Course</option>
         {% for id in ids %}
-            <option  value="{{ id.id }}">{{ id.id }} - {{ id.name }}</option>
+            <option value="{{ id.id }}">{{ id.id }} - {{ id.name }}</option>
         {% endfor %}
     </select>
 </div>
@@ -48,10 +66,9 @@ Home
 
 
 <p></p>
-<button class="btn btn-danger" type="submit">Submit</button>
-<button id="delete" name="delete" class="btn btn-warning" type="submit">Delete</button>
-
+<button class="btn btn-danger" type="submit">Change</button>
     
     </form>
 </div>
+{% endif %}
 {% endblock %}

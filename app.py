@@ -51,6 +51,8 @@ def admin():
         ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
+        course_id = courses[0]["id"]
+
         # Create a new course
         if id == "new":
             db.execute("INSERT INTO courses (text, price, name) VALUES ('Description', 'Free', 'Name')")
@@ -59,13 +61,15 @@ def admin():
             return redirect("/admin")
 
         # Delete Course
-        
+        elif id == "delete":
+
+            db.execute("DELETE FROM courses")
 
         # Change course info
-        elif request.form.get("name") and request.form.get("text") and request.form.get("id") and request.form.get("price"):
+        elif request.form.get("name") and request.form.get("text") and course_id != 0 and request.form.get("price"):
 
             db.execute("UPDATE courses SET text = ?, price = ?, name = ? WHERE id = ?",
-                request.form.get("text"),request.form.get("price"), request.form.get("name"), request.form.get("id"))
+                request.form.get("text"),request.form.get("price"), request.form.get("name"), course_id)
 
             flash("Course Updated")
             return redirect("/admin")
