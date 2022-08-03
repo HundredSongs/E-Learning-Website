@@ -6,6 +6,8 @@ Home
 
 {% block main %}
 
+{% if session["user_id"] %}
+
 {% for id in ids %}
 
 <div id="carousel" class="carousel slide" data-bs-ride="carousel">
@@ -16,7 +18,6 @@ Home
       <div class="py-5 carousel-caption center-top">
         <h1>Example headline.</h1>
         <p>Some representative placeholder content for the first slide of the carousel.</p>
-        <p><a class="btn btn-lg btn-light" href="#">Sign up today</a></p>
       </div>
     </div>
 </div>
@@ -35,7 +36,7 @@ Home
     <div class="row g-5">
       <div class="col-md-8">
         <h3 class="pb-4 mb-4 fst-italic border-bottom">
-          From the Firehose
+          {{ id.name }}
         </h3>
   
         <article class="blog-post">
@@ -97,5 +98,7 @@ Home
   </main>
 
 {% endfor %}
+{% endif %}
+
 
 {% endblock %}

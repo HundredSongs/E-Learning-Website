@@ -107,14 +107,13 @@ def account():
 @login_required
 def buy():
 
-    id = request.form.get("id")
+    id = int(request.form.get("id"))
     course = db.execute("SELECT * FROM courses WHERE id = ?", id)
     users_courses = db.execute("SELECT * FROM users_courses WHERE course_id = ? AND user_id = ?", id, session["user_id"])
     price = course[0]["price"]
 
-
     # Enroll if it's a free course
-    if price.casefold() == "free":
+    if price.casefold() == "free" and len(users_courses) == 0:
 
         db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
                     session["user_id"], course[0]["id"])
@@ -122,11 +121,25 @@ def buy():
         return redirect("/account")
 
     # Go to an alreaady owned course
-    elif len(users_courses[0]) == 1:
+    elif len(users_courses) == 1:
 
-        return render_template("course.html", id = users_courses)
+        return redirect("/account")
 
-    return render_template("buy.html")
+    else:
+        return render_template("buy.html")
+
+
+@app.route("/course", methods=["GET", "POST"])
+def course():
+
+    id = int(request.form.get("id"))
+    course = db.execute("SELECT * FROM courses WHERE id = ?", id)
+
+    if id == None:
+        return redirect("/courses", 404)
+
+    else:
+        return render_template(f"courses/{id}.html")
 
 
 @app.route("/courses")
@@ -136,6 +149,7 @@ def courses():
     return render_template("courses.html", ids = courses)
 
 
+# Courses Info
 @app.route("/info", methods=["GET", "POST"])
 def info():
 

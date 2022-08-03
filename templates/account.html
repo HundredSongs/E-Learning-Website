@@ -7,6 +7,11 @@ Account
 {% block main %}
 
 {% if ids %}
+
+<p></p>
+<p class="fs-5 fw-semibold">My Courses</p>
+
+
 <div class="album py-5 bg-light">
   <div class="container">
 
@@ -14,7 +19,7 @@ Account
 
       {% for id in ids %}
 
-      <form action="/info" method="post">
+      <form action="/course" method="post">
 
       <div class="col">
         <div class="card shadow-sm">
@@ -58,7 +63,7 @@ Account
 
       {% for free in frees %}
 
-      <form action="/course" method="post">
+      <form action="/info" method="post">
 
       <div class="col">
         <div class="card shadow-sm">
