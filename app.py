@@ -34,8 +34,6 @@ def after_request(response):
     return response
 
 
-
-
 # Main Page
 @app.route("/")
 def index():
@@ -170,7 +168,7 @@ def courses():
 
 
 # Courses Info
-@app.route("/info", methods=["GET"])
+@app.route("/info", methods=["GET", "POST"])
 def info():
 
     try:
@@ -295,3 +293,91 @@ def signup():
         return render_template("signup.html")
 
 
+# Account Settings
+@app.route("/settings", methods=["GET", "POST"])
+@login_required
+def settings():
+
+    """Change account settings"""
+
+    if request.method == "POST":
+
+        # Ensure password was submitted
+        if not request.form.get("password"):
+            flash("Must provide password")
+            return redirect("/account")
+
+
+        # Delete account
+        elif request.form.get("delete") != None:
+            # Query database for username
+            # Ensure username exists and password is correct
+            rows = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+
+            if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+                flash("Wrong Password!")
+                return redirect("/settings")
+
+            # Delete account
+            else:
+
+                db.execute("DELETE FROM users WHERE users.id = ?", session["user_id"])
+                db.execute("DELETE FROM users_courses WHERE user_id = ?", session["user_id"])
+                db.execute("DELETE FROM history WHERE history.person_id = ?", session["user_id"])
+
+                return redirect("/login")
+
+
+        # Check if users wants to change password
+        if request.form.get("button_pass") != None:
+            # Ensure new password was submitted
+            if not request.form.get("password_new"):
+                flash("Must provide new password")
+                return redirect("/account")
+
+            # Ensure new password confirmation was submitted
+            elif not request.form.get("password_confirm"):
+                flash("Must confirm new password")
+                return redirect("/account")
+
+            # Ensure new password confirmation was submitted
+            elif request.form.get("password_new") != request.form.get("password_confirm"):
+                flash("New passwords do not match")
+                return redirect("/account")
+
+            else:
+                # Check if password is acceptable - has digit, letters and no spaces
+                password_new = request.form.get("password_new")
+                a = b = c = False
+                for i in range(len(password_new)):
+
+                    if password_new[i].isspace():
+                        a = True
+                    elif password_new[i].isalpha():
+                        b = True
+                    elif password_new[i].isnumeric():
+                        c = True
+
+                if a == True:
+                    flash("Must contain no spaces")
+
+                elif b == False or c == False:
+                    flash("Must have digits and letters!")
+
+                elif a == False and b == True and c == True:
+                    # Query database for username
+                    # Ensure username exists and password is correct
+                    rows = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+
+                    if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+                        flash("Wrong Password!")
+                        return redirect("/account")
+
+                    # Insert new password into database
+                    db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(password_new), session["user_id"])
+                    flash("Password changed!")
+                    return redirect("/account")
+
+
+    else:
+        return render_template("account_settings.html")

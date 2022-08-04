@@ -64,14 +64,14 @@ Account
 
       {% for free in frees %}
 
-      <form action="/info" method="post">
+      <form action="/info" method="get">
 
       <div class="col">
         <div class="card shadow-sm">
           <img src="../static/courses/{{ free.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
 
           <div class="card-body">
-            <p class="card-text fw-bold">{{ id.name }}</p>
+            <p class="card-text fw-bold">{{ free.name }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
                 <button class="btn btn-sm btn-outline-secondary" id="id" name="id" value="{{ free.id }}">Enroll</a>
