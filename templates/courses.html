@@ -46,14 +46,14 @@ Home
 
         {% for id in ids %}
 
-        <form action="/info" method="post">
+        <form action="/info" method="get">
 
         <div class="col">
           <div class="card shadow-sm">
             <img src="../static/courses/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
 
             <div class="card-body">
-              <p class="card-text">{{ id.text }}</p>
+              <p class="card-text fw-bold">{{ id.name }}</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
                   <button class="btn btn-sm btn-outline-secondary" id="id" name="id" value="{{ id.id }}">Enroll</a>

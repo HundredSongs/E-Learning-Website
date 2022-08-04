@@ -5,7 +5,7 @@ from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from tempfile import mkdtemp
-from requests import post
+from requests import delete, post
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from helpers import login_required
@@ -39,11 +39,39 @@ def index():
 
     courses = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
     return render_template("index.html", ids = courses)
-    
 
-@app.route("/admin", methods=["GET", "POST"])
+
+# Users Account
+@app.route("/account")
 @login_required
-def admin():
+def account():
+
+    users_courses = db.execute("SELECT * FROM users_courses, courses WHERE courses.id = users_courses.course_id AND user_id = ?",
+         session["user_id"])
+
+    # See if user has enroled in any course
+    if len(users_courses) == 0:
+
+        free = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
+
+        flash("Look for a course that you may like!")
+        return render_template("account.html", frees = free)
+
+    return render_template("account.html", ids = users_courses)
+
+
+# Control panel
+@app.route("/backoffice")
+@login_required
+def backoffice():
+
+    return render_template("backoffice.html")
+
+
+# Change courses info
+@app.route("/backoffice-info", methods=["GET", "POST"])
+@login_required
+def backoffice_info():
 
     if request.method == "POST":
 
@@ -55,27 +83,23 @@ def admin():
 
         # Create a new course
         if id == "new":
-            db.execute("INSERT INTO courses (text, price, name) VALUES ('Description', 'Free', 'Name')")
+            db.execute("INSERT INTO courses (price, name) VALUES ('Free', 'Name')")
 
             flash("New Course Created")
-            return redirect("/admin")
+            return redirect("/backoffice")
 
-        # Delete Course
-        elif id == "delete":
-
-            db.execute("DELETE FROM courses")
 
         # Change course info
-        elif request.form.get("name") and request.form.get("text") and course_id != 0 and request.form.get("price"):
+        elif request.form.get("name") and course_id != 0 and request.form.get("price"):
 
-            db.execute("UPDATE courses SET text = ?, price = ?, name = ? WHERE id = ?",
-                request.form.get("text"),request.form.get("price"), request.form.get("name"), course_id)
+            db.execute("UPDATE courses SET price = ?, name = ? WHERE id = ?",
+                request.form.get("price"), request.form.get("name"), course_id)
 
             flash("Course Updated")
-            return redirect("/admin")
+            return redirect("/backoffice")
 
         else:
-            return render_template("admin.html", courses = courses, ids = ids)
+            return render_template("backoffice-info.html", courses = courses, ids = ids)
 
     # Render Template
     else:
@@ -83,26 +107,18 @@ def admin():
         ids = db.execute("SELECT * FROM courses")
         courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
-        return render_template("admin.html", courses = courses, ids = ids)
+        return render_template("backoffice-info.html", courses = courses, ids = ids)
 
 
-@app.route("/account")
+# Change courses pages
+@app.route("/backoffice-pages")
 @login_required
-def account():
+def backoffice_pages():
 
-    users_courses = db.execute("SELECT * FROM users_courses, courses WHERE courses.id = users_courses.course_id AND user_id = ?",
-         session["user_id"])
-
-    if len(users_courses) == 0:
-
-        free = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
-
-        flash("Look for a course that you may like!")
-        return render_template("account.html", frees = free)
-
-    return render_template("account.html", ids = users_courses)
+    return render_template("backoffice-pages.html")
 
 
+# Buy Page
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
@@ -123,12 +139,13 @@ def buy():
     # Go to an alreaady owned course
     elif len(users_courses) == 1:
 
-        return redirect("/account")
+        return render_template(f"courses/{id}.html")
 
     else:
         return render_template("buy.html")
 
 
+# Individual course
 @app.route("/course", methods=["GET", "POST"])
 def course():
 
@@ -136,12 +153,12 @@ def course():
     course = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
     if id == None:
-        return redirect("/courses", 404)
-
+        return redirect("/courses")
     else:
         return render_template(f"courses/{id}.html")
 
 
+# List all Courses
 @app.route("/courses")
 def courses():
 
@@ -150,20 +167,24 @@ def courses():
 
 
 # Courses Info
-@app.route("/info", methods=["GET", "POST"])
+@app.route("/info", methods=["GET"])
 def info():
 
-    if request.method == "POST":
-
-        id = request.form.get("id")
+    try:
+        id = int(request.args.get("id"))
         course = db.execute("SELECT * FROM courses WHERE id = ?", id)
+        all_courses = db.execute("SELECT * FROM courses")
+
+        if int(id) < 0 or int(id) > len(all_courses):
+            return redirect("/courses")
 
         return render_template("info.html", ids = course)
-    
-    else:
-        return redirect("/info")
+
+    except ValueError:
+        return redirect("/courses")
 
 
+# Login
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -200,6 +221,7 @@ def login():
     return render_template("login.html")
 
 
+# Logout
 @app.route("/logout")
 def logout():
 
@@ -211,6 +233,7 @@ def logout():
     return redirect("/")
 
 
+# Register user
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
 

@@ -1,4 +1,4 @@
-{% extends "layout-account.html" %}
+{% extends "layout.html" %}
 
 {% block title %}
 Account
@@ -9,13 +9,14 @@ Account
 {% if ids %}
 
 <p></p>
-<p class="fs-5 fw-semibold">My Courses</p>
+<div>
+<p class="fs-5 fw-semibold text-center">My Courses</p>
 
 
-<div class="album py-5 bg-light">
+<div class="album">
   <div class="container">
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+    <div class="row row-cols-1 row-cols-sm-3 row-cols-md-3 g-3">
 
       {% for id in ids %}
 
@@ -23,9 +24,10 @@ Account
 
       <div class="col">
         <div class="card shadow-sm">
-          <img src="../static/courses/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
+          <img src="../static/courses/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="255" alt="...">
 
           <div class="card-body">
+            <p class="card-text fw-bold">{{ id.name }}</p>
             <p class="card-text">{{ id.text }}</p>
             <div class="d-flex justify-content-between align-items-center">
               <div class="btn-group">
@@ -88,7 +90,7 @@ Account
     </div>
   </div>
 </div>
-
+</div>
 
 
 
