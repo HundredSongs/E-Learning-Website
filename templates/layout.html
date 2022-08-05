@@ -22,11 +22,12 @@
 
 
         <!-- Navbar -->
+        
         <header class="p-3 text-bg-light sticky-sm-top">
             <div class="container">
               <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                  <img class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap" src="../static/logo2.png"></img>
+                  <img class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap" src="../static/images/logo/logo2.png"></img>
                 </a>
 
 
@@ -85,7 +86,6 @@
               </div>
             </div>            
           </header>
-        <!-- End Navbar -->
 
         <!-- Show Error Messages -->
         
@@ -105,6 +105,8 @@
             {% block main %}{% endblock %}
         </main>
         
+        <!-- Footer -->
+
         <div class="container">
             <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
               <div class="col-md-4 d-flex align-items-center">
@@ -127,6 +129,22 @@
               </ul>
             </footer>
           </div>
+
+          <!-- Toast Pop-Up -->
+
+          <script>
+          
+            const toastTrigger = document.getElementById('liveToastBtn')
+            const toastLiveExample = document.getElementById('liveToast')
+            if (toastTrigger) {
+              toastTrigger.addEventListener('click', () => {
+                const toast = new bootstrap.Toast(toastLiveExample)
+            
+                toast.show()
+              })
+            }
+            
+            </script>
 
     </body>
 </html>

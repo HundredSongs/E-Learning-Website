@@ -325,6 +325,7 @@ def settings():
                 db.execute("DELETE FROM users_courses WHERE user_id = ?", session["user_id"])
                 db.execute("DELETE FROM history WHERE history.person_id = ?", session["user_id"])
 
+                flash("Account deleted")
                 return redirect("/login")
 
 
