@@ -55,68 +55,9 @@ def account():
 
         free = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
 
-        flash("Look for a course that you may like!")
         return render_template("account.html", frees = free)
 
     return render_template("account.html", ids = users_courses)
-
-
-# Control panel
-@app.route("/backoffice")
-@login_required
-def backoffice():
-
-    return render_template("backoffice.html")
-
-
-# Change courses info
-@app.route("/backoffice-info", methods=["GET", "POST"])
-@login_required
-def backoffice_info():
-
-    if request.method == "POST":
-
-        id = request.form.get("id")
-        ids = db.execute("SELECT * FROM courses")
-        courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
-
-        course_id = courses[0]["id"]
-
-        # Create a new course
-        if id == "new":
-            db.execute("INSERT INTO courses (price, name) VALUES ('Free', 'Name')")
-
-            flash("New Course Created")
-            return redirect("/backoffice")
-
-
-        # Change course info
-        elif request.form.get("name") and course_id != 0 and request.form.get("price"):
-
-            db.execute("UPDATE courses SET price = ?, name = ? WHERE id = ?",
-                request.form.get("price"), request.form.get("name"), course_id)
-
-            flash("Course Updated")
-            return redirect("/backoffice")
-
-        else:
-            return render_template("backoffice-info.html", courses = courses, ids = ids)
-
-    # Render Template
-    else:
-        id = request.form.get("id")
-        ids = db.execute("SELECT * FROM courses")
-        courses = db.execute("SELECT * FROM courses WHERE id = ?", id)
-
-        return render_template("backoffice-info.html", courses = courses, ids = ids)
-
-
-# Change courses pages
-@app.route("/backoffice-pages")
-@login_required
-def backoffice_pages():
-
-    return render_template("backoffice-pages.html")
 
 
 # Buy Page
@@ -129,21 +70,31 @@ def buy():
     users_courses = db.execute("SELECT * FROM users_courses WHERE course_id = ? AND user_id = ?", id, session["user_id"])
     price = course[0]["price"]
 
-    # Enroll if it's a free course
-    if price.casefold() == "free" and len(users_courses) == 0:
+    if "cart" not in session:
+        session["cart"] = []
 
-        db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
-                    session["user_id"], course[0]["id"])
-        
-        return redirect("/account")
+    # POST
+    if request.method == "POST":
 
-    # Go to an alreaady owned course
-    elif len(users_courses) == 1:
+        # Enroll if it's a free course
+        if price.casefold() == "free" and len(users_courses) == 0:
 
-        return render_template(f"courses/{id}.html")
+            db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
+                        session["user_id"], course[0]["id"])
+            
+            return redirect("/account")
 
-    else:
-        return render_template("buy.html")
+        # Go to an alreaady owned course
+        elif len(users_courses) == 1:
+
+            return render_template(f"courses/{id}.html")
+
+        elif id:
+            session["cart"].append(id)
+
+    # GET
+    cart = db.execute("SELECT * FROM courses WHERE id IN (?)", session["cart"])
+    return render_template("buy.html", cart = cart)
 
 
 # Individual course
@@ -234,6 +185,31 @@ def logout():
     return redirect("/")
 
 
+# Check if password is acceptable - has digit, letters and no spaces
+def password_check(password):
+
+    a = b = c = False
+    for i in range(len(password)):
+
+        if password[i].isspace():
+            a = True
+        elif password[i].isalpha():
+            b = True
+        elif password[i].isnumeric():
+            c = True
+
+    if a == True:
+        flash("Password must contain no spaces")
+        return False
+
+    elif b == False or c == False:
+        flash("Password must have digits and letters!")
+        return False
+
+    elif a == False and b == True and c == True:
+        return True
+
+
 # Register user
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -268,26 +244,33 @@ def signup():
         elif password != confirmation:
             flash("Passwords dont match")
             return render_template("signup.html")
+
+        # Run password_check function
+        else:
+            if password_check(password):
+
+                # Query database for username
+                rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+
+                # Check if user is allready taken
+                if len(rows) == 1:
+                    flash("Username allready exists!")
+                    return render_template("signup.html")
+
+                # Create new row in people table
+                db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, generate_password_hash(password))
+
+                # Query database for username
+                rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+
+                # Remember which user has logged in
+                session["user_id"] = rows[0]["id"]
+                
+                # Redirect user to home page
+                return redirect("/courses")
             
-        # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
-
-        # Check if user is allready taken
-        if len(rows) == 1:
-            flash("Username allready exists!")
-            return render_template("signup.html")
-
-        # Create new row in people table
-        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, generate_password_hash(password))
-
-        # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
-
-        # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
-        
-        # Redirect user to home page
-        return redirect("/courses")
+            else:
+                return render_template("signup.html")
 
     else:
         return render_template("signup.html")
@@ -300,12 +283,13 @@ def settings():
 
     """Change account settings"""
 
+    # POST
     if request.method == "POST":
 
-        # Ensure password was submitted
+        # Ensure the password was submitted
         if not request.form.get("password"):
             flash("Must provide password")
-            return redirect("/account")
+            return redirect("/settings")
 
 
         # Delete account
@@ -315,18 +299,18 @@ def settings():
             rows = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
 
             if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+                print(rows)
                 flash("Wrong Password!")
                 return redirect("/settings")
 
             # Delete account
             else:
 
-                db.execute("DELETE FROM users WHERE users.id = ?", session["user_id"])
+                db.execute("DELETE FROM users WHERE id = ?", session["user_id"])
                 db.execute("DELETE FROM users_courses WHERE user_id = ?", session["user_id"])
-                db.execute("DELETE FROM history WHERE history.person_id = ?", session["user_id"])
 
                 flash("Account deleted")
-                return redirect("/login")
+                return redirect("/logout")
 
 
         # Check if users wants to change password
@@ -334,51 +318,39 @@ def settings():
             # Ensure new password was submitted
             if not request.form.get("password_new"):
                 flash("Must provide new password")
-                return redirect("/account")
+                return redirect("/settings")
 
             # Ensure new password confirmation was submitted
             elif not request.form.get("password_confirm"):
                 flash("Must confirm new password")
-                return redirect("/account")
+                return redirect("/settings")
 
             # Ensure new password confirmation was submitted
             elif request.form.get("password_new") != request.form.get("password_confirm"):
                 flash("New passwords do not match")
-                return redirect("/account")
+                return redirect("/settings")
 
+            # Run password_check function
             else:
-                # Check if password is acceptable - has digit, letters and no spaces
                 password_new = request.form.get("password_new")
-                a = b = c = False
-                for i in range(len(password_new)):
+                if password_check(password_new):
 
-                    if password_new[i].isspace():
-                        a = True
-                    elif password_new[i].isalpha():
-                        b = True
-                    elif password_new[i].isnumeric():
-                        c = True
-
-                if a == True:
-                    flash("Must contain no spaces")
-
-                elif b == False or c == False:
-                    flash("Must have digits and letters!")
-
-                elif a == False and b == True and c == True:
                     # Query database for username
-                    # Ensure username exists and password is correct
                     rows = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
 
+                    # Ensure username exists and password is correct
                     if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
                         flash("Wrong Password!")
-                        return redirect("/account")
+                        return redirect("/settings")
 
                     # Insert new password into database
                     db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(password_new), session["user_id"])
                     flash("Password changed!")
-                    return redirect("/account")
+                    return redirect("/settings")
+                
+                else:
+                    return redirect("/settings")
 
-
+    # GET
     else:
         return render_template("account_settings.html")
