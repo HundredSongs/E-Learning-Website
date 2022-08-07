@@ -1,5 +1,7 @@
 from crypt import methods
+from itertools import count
 import os
+from types import NoneType
 
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
@@ -65,37 +67,76 @@ def account():
 @login_required
 def buy():
 
-    id = int(request.form.get("id"))
-    course = db.execute("SELECT * FROM courses WHERE id = ?", id)
-    users_courses = db.execute("SELECT * FROM users_courses WHERE course_id = ? AND user_id = ?", id, session["user_id"])
-    price = course[0]["price"]
-
     if "cart" not in session:
         session["cart"] = []
+
+    if "promo" not in session:
+        session["promo"] = []
 
     # POST
     if request.method == "POST":
 
-        # Enroll if it's a free course
-        if price.casefold() == "free" and len(users_courses) == 0:
+        id = request.form.get("id")
+        promo = request.form.get("promo")
 
-            db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
-                        session["user_id"], course[0]["id"])
-            
-            return redirect("/account")
+        # If buying a course
+        if id:
 
-        # Go to an alreaady owned course
-        elif len(users_courses) == 1:
+            course = db.execute("SELECT * FROM courses WHERE id = ?", id)
+            users_courses = db.execute("SELECT * FROM users_courses WHERE course_id = ? AND user_id = ?", id, session["user_id"])
+            price = course[0]["price"]
 
-            return render_template(f"courses/{id}.html")
+            # Enroll if it's a free course
+            if price == 0 and len(users_courses) == 0:
 
-        elif id:
-            session["cart"].append(id)
+                db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
+                            session["user_id"], course[0]["id"])
+                
+                return redirect("/account")
+
+            # Go to an alreaady owned course
+            elif len(users_courses) == 1:
+
+                return render_template(f"courses/{id}.html")
+
+            # Else add item to the cart
+            elif id:
+                session["cart"].append(id)
+
+        # If redeeming a promo code
+        elif promo:
+
+            check_promo = db.execute("SELECT * FROM promo WHERE name = ?", promo)
+            promo_id = check_promo[0]["id"]
+
+            if len(check_promo) == 1:
+                session["promo"].append(promo_id)
+                return redirect("/buy")
+            else:
+                return redirect("/buy")
 
     # GET
     cart = db.execute("SELECT * FROM courses WHERE id IN (?)", session["cart"])
-    return render_template("buy.html", cart = cart)
+    cart_sum = db.execute("SELECT SUM(price) FROM courses WHERE id IN (?)", session["cart"])
 
+    promo = db.execute("SELECT * FROM promo WHERE id IN (?)", session["promo"])
+    promo_sum = db.execute("SELECT SUM(value) FROM promo WHERE id IN (?)", session["promo"])
+
+    cart_count = db.execute("SELECT COUNT(*) FROM courses WHERE id IN (?)", session["cart"])
+    count = cart_count[0]["COUNT(*)"]
+
+    print(promo_sum)
+    if len(promo) >= 1 and len(cart) >= 1:
+        total = cart_sum[0]["SUM(price)"] - promo_sum[0]["SUM(value)"]
+        return render_template("buy.html", cart=cart, promo=promo, total=total, count=count)
+    
+    elif len(promo) == 0 and len(cart) >= 1:
+        total = cart_sum[0]["SUM(price)"]
+        return render_template("buy.html", cart=cart, promo=promo, total=total, count=count)
+
+    elif len(promo) == 0 and len(cart) == 0:
+        return redirect("/buy")
+    
 
 # Individual course
 @app.route("/course", methods=["GET", "POST"])
