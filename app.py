@@ -77,6 +77,8 @@ def buy():
     if request.method == "POST":
 
         id = request.form.get("id")
+        payment = request.form.get("email")
+        print(payment)
         promo = request.form.get("promo")
 
         # If buying a course
@@ -103,11 +105,24 @@ def buy():
             elif id:
                 session["cart"].append(id)
 
+        elif payment:
+
+            db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
+                        session["user_id"], session["cart"])
+            
+            return redirect("/login")
+
         # If redeeming a promo code
         elif promo:
 
+            promo = promo.upper()
             check_promo = db.execute("SELECT * FROM promo WHERE name = ?", promo)
-            promo_id = check_promo[0]["id"]
+
+            try:
+                promo_id = check_promo[0]["id"]
+
+            except IndexError:
+                return redirect("/buy")
 
             if len(check_promo) == 1:
                 session["promo"].append(promo_id)
@@ -125,7 +140,6 @@ def buy():
     cart_count = db.execute("SELECT COUNT(*) FROM courses WHERE id IN (?)", session["cart"])
     count = cart_count[0]["COUNT(*)"]
 
-    print(promo_sum)
     if len(promo) >= 1 and len(cart) >= 1:
         total = cart_sum[0]["SUM(price)"] - promo_sum[0]["SUM(value)"]
         return render_template("buy.html", cart=cart, promo=promo, total=total, count=count)
@@ -356,6 +370,7 @@ def settings():
 
         # Check if users wants to change password
         if request.form.get("button_pass") != None:
+
             # Ensure new password was submitted
             if not request.form.get("password_new"):
                 flash("Must provide new password")
