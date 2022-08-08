@@ -7,10 +7,27 @@ Account
 {% block main %}
 <p></p>
 <div class="text-center">
-
-    <p class="fs-5 fw-bold">Account Settings</p>
+    
+    <p class="fs-5 fw-bold">{% for name in name %}{{ name.username }}{% endfor %}'s Account Settings</p>
 
     <p></p>
+    {% for name in name %}
+    <img class="bd-placeholder-img rounded-circle" width="140" height="140" src="{{ name.img }}" role="img" aria-label="Placeholder: 140x140" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"></rect></img>
+    {% endfor %}
+    <p></p>    
+
+    <form action="/settings" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <input type="file" class="form-control mx-auto w-auto" id="file" name="file">
+      </div>
+      <div class="mb-3">
+        <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+    </div>
+      <button class="btn btn-primary" name="image" type="submit" value="upload">Change Image</button>
+    </form>      
+
+    <p></p>
+
     <form action="/settings" method="post">
         <div class="mb-3">
             <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">

@@ -1,19 +1,28 @@
 from crypt import methods
 from itertools import count
 import os
+import re
 from types import NoneType
+from unicodedata import name
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp
 from requests import delete, post
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from helpers import login_required
 
 # Configure application
 app = Flask(__name__)
+
+# Configure upload folder
+UPLOAD_FOLDER = "./static/images/users"
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -331,6 +340,12 @@ def signup():
         return render_template("signup.html")
 
 
+# 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 # Account Settings
 @app.route("/settings", methods=["GET", "POST"])
 @login_required
@@ -367,9 +382,34 @@ def settings():
                 flash("Account deleted")
                 return redirect("/logout")
 
+        # Change User Image
+        elif request.form.get("image"):
+
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                flash('No file part')
+                return redirect("/settings")
+
+            file = request.files['file']
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                flash('No selected file')
+                return redirect("/settings")
+
+            if file and allowed_file(file.filename):
+
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+
+                os.rename(os.path.join(app.config["UPLOAD_FOLDER"], filename), os.path.join(app.config["UPLOAD_FOLDER"], str(session["user_id"]) + ".png"))
+                
+                db.execute("UPDATE users SET img = ?", os.path.join(app.config["UPLOAD_FOLDER"], str(session["user_id"]) + ".png"))
+
+                return redirect("/settings")
 
         # Check if users wants to change password
-        if request.form.get("button_pass") != None:
+        elif request.form.get("button_pass") != None:
 
             # Ensure new password was submitted
             if not request.form.get("password_new"):
@@ -409,4 +449,5 @@ def settings():
 
     # GET
     else:
-        return render_template("account_settings.html")
+        name = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+        return render_template("account_settings.html", name=name)
