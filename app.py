@@ -1,3 +1,4 @@
+from asyncio import run_coroutine_threadsafe
 from crypt import methods
 from itertools import count
 import os
@@ -340,11 +341,18 @@ def signup():
         return render_template("signup.html")
 
 
-# 
+# Function to check if file is allowed
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@app.route("/search")
+def search():
+
+    # GET
+    sql = db.execute("SELECT * FROM courses WHERE name LIKE ?", "%" + request.args.get("q") + "%")
+    return render_template("search.html", ids=sql)
 
 # Account Settings
 @app.route("/settings", methods=["GET", "POST"])
