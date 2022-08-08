@@ -72,6 +72,26 @@ def account():
     return render_template("account.html", ids = users_courses)
 
 
+# Admin Page
+@app.route("/admin")
+@login_required
+def admin():
+
+    # GET
+    cupon = db.execute("SELECT * FROM promo")
+    return render_template("admin.html", cupon=cupon)
+
+
+# Admin Page
+@app.route("/admin_cupon", methods=["POST"])
+@login_required
+def admin_cupon():
+
+    # POST
+    cupon = db.execute("SELECT * FROM promo WHERE name = ?", request.form.get("name"))
+    return render_template("admin_cupon.html", cupon=cupon)
+
+
 # Buy Page
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
@@ -167,7 +187,6 @@ def buy():
 def course():
 
     id = int(request.form.get("id"))
-    course = db.execute("SELECT * FROM courses WHERE id = ?", id)
 
     if id == None:
         return redirect("/courses")
