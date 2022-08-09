@@ -88,8 +88,31 @@ def admin():
 def admin_cupon():
 
     # POST
-    cupon = db.execute("SELECT * FROM promo WHERE name = ?", request.form.get("name"))
-    return render_template("admin_cupon.html", cupon=cupon)
+    # Change cupon info or add a new cupon
+    if request.form.get("change_info") != None:
+
+        # Create a new cupon
+        if request.form.get("id") == "New Cupon":
+            db.execute("INSERT INTO promo (value, name) VALUES (0, 'New Cupon')")
+            cupon = db.execute("SELECT * FROM promo WHERE name = ?", request.form.get("id"))
+            return render_template("admin_cupon.html", cupon=cupon)
+
+        # Got to change cupon info page
+        cupon = db.execute("SELECT * FROM promo WHERE id = ?", request.form.get("id"))
+        return render_template("admin_cupon.html", cupon=cupon)
+
+    # Update cupon info
+    elif request.form.get("submit") != None:
+
+        db.execute("UPDATE promo SET value = ?, name = ? WHERE id = ?",
+                    request.form.get("value"), request.form.get("name").upper(), request.form.get("id"))
+
+        return redirect("/admin")
+
+    # Delete cupon
+    elif request.form.get("delete") != None:
+        db.execute("DELETE FROM promo WHERE id = ?", request.form.get("id"))
+        return redirect("/admin")
 
 
 # Buy Page
@@ -198,6 +221,10 @@ def course():
 @app.route("/courses")
 def courses():
 
+    # Delete all cart information
+    session["cart"] = []
+
+    # Query database for all courses and return them
     courses = db.execute("SELECT * FROM courses")
     return render_template("courses.html", ids = courses)
 
@@ -206,6 +233,10 @@ def courses():
 @app.route("/info", methods=["GET", "POST"])
 def info():
 
+    # Delete all cart information
+    session["cart"] = []
+
+    # Try to get course ID if exists
     try:
         id = int(request.args.get("id"))
         course = db.execute("SELECT * FROM courses WHERE id = ?", id)
@@ -216,6 +247,7 @@ def info():
 
         return render_template("info.html", ids = course)
 
+    # If it's not a valid input redirect the page
     except ValueError:
         return redirect("/courses")
 
@@ -366,10 +398,11 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# Search bar
 @app.route("/search")
 def search():
 
-    # GET
+    # GET - Search query and return
     sql = db.execute("SELECT * FROM courses WHERE name LIKE ?", "%" + request.args.get("q") + "%")
     return render_template("search.html", ids=sql)
 

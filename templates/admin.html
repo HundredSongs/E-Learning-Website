@@ -35,19 +35,20 @@ Admin
 <form action="/admin_cupon" method="post">
     <div class="mb-3 text-center">
         <p></p>
-        <select class="form-select mx-auto w-auto" name="name">
+        <select class="form-select mx-auto w-auto" name="id">
             <option disabled="" selected="" value="name">Select Cupon</option>
 
             {% for cupon in cupon %}
-            <option value="{{ cupon.name }}">{{ cupon.name }}</option>
+            <option value="{{ cupon.id }}">{{ cupon.name }}</option>
             {% endfor %}
+            <option value="New Cupon">New Cupon</option>
 
         </select>
         <p></p>
     </div>
 
     <div class="mb-3 text-center">
-    <button class="btn btn-danger" name="change" type="submit">Change Info</button>
+      <button class="btn btn-danger" name="change_info" type="submit">Change Info</button>
     </div>
 </form>
 
