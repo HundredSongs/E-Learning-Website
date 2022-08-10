@@ -54,6 +54,13 @@ def index():
     return render_template("index.html", ids = courses)
 
 
+# About Page
+@app.route("/about")
+def about():
+
+    return render_template("about.html")
+
+
 # Users Account
 @app.route("/account")
 @login_required
@@ -227,6 +234,13 @@ def courses():
     # Query database for all courses and return them
     courses = db.execute("SELECT * FROM courses")
     return render_template("courses.html", ids = courses)
+
+
+# FAQ
+@app.route("/faq")
+def faq():
+
+    return render_template("faq.html")
 
 
 # Courses Info

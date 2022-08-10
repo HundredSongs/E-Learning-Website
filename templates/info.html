@@ -14,9 +14,8 @@ Home
     <img class="img-fluid bd-placeholder-img bd-placeholder-img-lg d-block w-100" src="../static/images/carousel/img.png" role="img" aria-label="Placeholder: First slide" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#777"></rect></img>
 
       <div class="py-5 carousel-caption center-top">
-        <h1>Example headline.</h1>
+        <h1>{{ id.name }}</h1>
         <p>Some representative placeholder content for the first slide of the carousel.</p>
-        <p><a class="btn btn-lg btn-light" href="#">Sign up today</a></p>
       </div>
     </div>
 </div>
@@ -74,7 +73,7 @@ Home
             <img src="../static/images/courses/{{ id.id }}.png" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="...">
 
             <div class="card-body">
-              <p class="card-text">{{ id.text }}</p>
+              <p class="card-text">{{ id.name }}</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
                   <button class="btn btn-sm btn-outline-secondary" id="id" name="id" value="{{ id.id }}">Enroll</a>
