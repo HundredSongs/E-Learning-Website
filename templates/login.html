@@ -5,7 +5,7 @@ Login
 {% endblock %}
 
 {% block main %}
-<form action="/login" method="post">
+<form action="/login" method="post" class="needs-validation" novalidate>
 
   <img class="mb-4" src="../static/images/logo/logo2.png" alt="" width="72" height="57">
   <h1 class="h3 mb-3 fw-normal">Sign In</h1>
@@ -23,11 +23,17 @@ Login
   <div class="form-floating">
     <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="" required>
     <label for="username">Username</label>
+    <div class="invalid-feedback">
+      Please provide a Username.
+    </div>
   </div>
 
   <div class="form-floating">
     <input type="password" class="form-control" id="password" name="password" placeholder="Password" value="" required>
     <label for="password">Password</label>
+    <div class="invalid-feedback">
+      Please provide a password.
+    </div>
   </div>
 
 
@@ -45,4 +51,7 @@ Login
   <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
 
 </form>
+
+<script src="../static/form-validation.js"></script>
+
 {% endblock %}

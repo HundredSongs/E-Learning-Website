@@ -163,7 +163,8 @@ def buy():
 
             # Else add item to the cart
             elif id:
-                session["cart"].append(id)
+                if id not in session["cart"]:    
+                    session["cart"].append(id)
 
         elif payment:
 
@@ -279,12 +280,10 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            flash('must provide username')
             return render_template("login.html")
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            flash("Must provide password")
             return render_template("login.html")
 
         # Query database for username
@@ -357,17 +356,14 @@ def signup():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            flash("Must provide username")
             return render_template("signup.html")
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            flash("Must provide password")
             return render_template("signup.html")
             
         # Ensure password confirmation was submitted
         elif not request.form.get("confirmation"):
-            flash("Must provide password")
             return render_template("signup.html")
 
         # # Ensure the passwords are the same

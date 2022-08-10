@@ -25,16 +25,25 @@ Sign-up
     <div class="form-floating">
       <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="" required>
       <label for="username">Username</label>
+      <div class="invalid-feedback">
+        Please provide a Username.
+      </div>
     </div>
 
     <div class="form-floating">
       <input type="password" class="form-control" id="password" name="password" placeholder="Password" value="" required>
       <label for="password">Password</label>
+      <div class="invalid-feedback">
+        Please provide a password.
+      </div>
     </div>
 
     <div class="form-floating">
         <input type="password" class="form-control" id="confirmation" name="confirmation" placeholder="Password" value="" required>
         <label for="confirmation">Confirm Password</label>
+        <div class="invalid-feedback">
+          Please confirm your password.
+        </div>
     </div>
     
 
@@ -52,4 +61,7 @@ Sign-up
     <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
   
   </form>
+
+  <script src="../static/form-validation.js"></script>
+
 {% endblock %}
