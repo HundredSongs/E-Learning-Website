@@ -14,7 +14,7 @@ from requests import delete, post
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from helpers import login_required
+from helpers import login_required, register_required
 
 # Configure application
 app = Flask(__name__)
@@ -65,6 +65,8 @@ def about():
 @app.route("/account")
 @login_required
 def account():
+    
+    session["cart"] = []
 
     users_courses = db.execute("SELECT * FROM users_courses, courses WHERE courses.id = users_courses.course_id AND user_id = ?",
          session["user_id"])
@@ -72,9 +74,7 @@ def account():
     # See if user has enroled in any course
     if len(users_courses) == 0:
 
-        free = db.execute("SELECT * FROM courses ORDER BY id DESC LIMIT 3")
-
-        return render_template("account.html", frees = free)
+        return render_template("account.html")
 
     return render_template("account.html", ids = users_courses)
 
@@ -124,7 +124,7 @@ def admin_cupon():
 
 # Buy Page
 @app.route("/buy", methods=["GET", "POST"])
-@login_required
+@register_required
 def buy():
 
     if "cart" not in session:
@@ -171,7 +171,7 @@ def buy():
             db.execute("INSERT INTO users_courses (user_id, course_id) VALUES (?, ?)",
                         session["user_id"], session["cart"])
             
-            return redirect("/login")
+            return redirect("/account")
 
         # If redeeming a promo code
         elif promo:
@@ -296,6 +296,7 @@ def login():
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
+        session["admin"] = rows[0]["admin"]
 
         return redirect("/account")
 
@@ -391,7 +392,8 @@ def signup():
 
                 # Remember which user has logged in
                 session["user_id"] = rows[0]["id"]
-                
+                session["admin"] = rows[0]["admin"]
+
                 # Redirect user to home page
                 return redirect("/courses")
             
@@ -443,7 +445,7 @@ def settings():
                 flash("Wrong Password!")
                 return redirect("/settings")
 
-            # Delete account
+            # Delete account 
             else:
 
                 db.execute("DELETE FROM users WHERE id = ?", session["user_id"])

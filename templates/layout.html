@@ -55,7 +55,7 @@
                         Account
                       </button>
                       <ul class="dropdown-menu">
-                        {% if session["user_id"] == 8 %}
+                        {% if session["admin"] == 1 %}
                         <li><a class="dropdown-item" href="/admin">Admin</a></li>
                         {% endif %}
                         <li><a class="dropdown-item" href="/account">Courses</a></li>
