@@ -23,7 +23,7 @@ Admin
         {% for cupon in cupon %}
       <tr>
         <th scope="row">{{ cupon.id }}</th>
-        <td>{{ cupon.value }}</td>
+        <td>${{ cupon.value }}</td>
         <td>{{ cupon.name }}</td>
       </tr>
       {% endfor %}

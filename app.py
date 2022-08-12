@@ -272,6 +272,9 @@ def info():
 def login():
 
     # Forget any user_id
+    session["user_id"] = []
+    session["cart"] = []
+    session["admin"] = []
     session.clear()
 
     """Login user"""
@@ -310,6 +313,9 @@ def logout():
     """Logout user"""
 
     # Forget any user_id
+    session["user_id"] = []
+    session["cart"] = []
+    session["admin"] = []
     session.clear()
 
     return redirect("/")
@@ -345,7 +351,11 @@ def password_check(password):
 def signup():
 
     # Forget any user_id
+    session["user_id"] = []
+    session["cart"] = []
+    session["admin"] = []
     session.clear()
+
 
     """Register user"""
     username = request.form.get("username")
@@ -476,7 +486,7 @@ def settings():
 
                 os.rename(os.path.join(app.config["UPLOAD_FOLDER"], filename), os.path.join(app.config["UPLOAD_FOLDER"], str(session["user_id"]) + ".png"))
                 
-                db.execute("UPDATE users SET img = ?", os.path.join(app.config["UPLOAD_FOLDER"], str(session["user_id"]) + ".png"))
+                db.execute("UPDATE users SET img = ? WHERE id = ?", os.path.join(app.config["UPLOAD_FOLDER"], str(session["user_id"]) + ".png"), session["user_id"])
 
                 return redirect("/settings")
 
