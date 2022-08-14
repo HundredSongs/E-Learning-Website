@@ -2,6 +2,11 @@
 #### Video Demo:  <https://youtu.be/mdLrnfn5Zks>
 #### Description:
 
+This is an E-Learning web-based application using JavaScript, Python, and SQL. 
+Its main purpose is to educate people and help everyone to have a qualified education.
+
+------------------------------------------------------------------------------------
+
 Index
 
 Index is the home page, it's an extension from layout.html.
